@@ -1,0 +1,30 @@
+version: "3.3"
+services:
+  test-mysql:
+    image: mysql:8
+    ports:
+      - "3333:3306"
+    volumes:
+      - ./mysql/.data:/var/lib/mysql
+      - ./mysql/initdb:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_DATABASE: test-db
+      MYSQL_ROOT_PASSWORD: test-db
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default_authentication_plugin=mysql_native_password
+    networks:
+      - test-network
+    container_name: test-mysql
+  test-api:
+    build: ./
+    image: test-api:1.0.0
+    depends_on:
+      - test-mysql
+    ports:
+      - "3000:3000"
+    networks:
+      - test-network
+    container_name: test-api
+
+
+networks:
+  test-network:
